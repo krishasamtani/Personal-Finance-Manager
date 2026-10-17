@@ -60,12 +60,6 @@ def sidebar(user_id):
         if st.button("✨ Load demo data"):
             n = demo.load_demo_data(user_id)
             st.success(f"Loaded {n} demo transactions, 5 holdings and budgets.")
-        with st.expander("⚠️ Danger zone"):
-            confirm = st.checkbox("I understand this deletes my account and all my data")
-            if st.button("Delete my account") and confirm:
-                database.delete_user(user_id)
-                st.session_state.clear()
-                st.rerun()
     return page
 
 

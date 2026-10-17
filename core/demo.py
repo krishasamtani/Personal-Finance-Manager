@@ -65,10 +65,20 @@ def build_demo_transactions(months=12, seed=7, today=None):
     return rows
 
 
-def simulate_prices(days=260, seed=11):
+def trading_days(days, today=None):
+    """Exactly `days` weekdays ending on or before `today`.
+
+    (pd.bdate_range(end=<weekend>, periods=n) silently returns n-1 dates, hence this helper.)
+    """
+    end = pd.Timestamp(today or pd.Timestamp.today()).normalize()
+    every_day = pd.date_range(end=end, periods=days * 2)
+    return every_day[every_day.dayofweek < 5][-days:]
+
+
+def simulate_prices(days=260, seed=11, today=None):
     """Correlated random-walk price history ending at each demo asset's current price."""
     rng = np.random.default_rng(seed)
-    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    dates = trading_days(days, today)
     market = rng.normal(0.0004, 0.009, days)
     out = {}
     for ticker, _, _, current, _, beta, vol in DEMO_ASSETS:
